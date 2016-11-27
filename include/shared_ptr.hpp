@@ -10,102 +10,122 @@ public:
     shared_ptr(shared_ptr && other);/*noexcept*/
     auto operator= (shared_ptr const & other)->shared_ptr &;/*noexcept*/
     auto operator =(shared_ptr && other) -> shared_ptr &;/*noexcept*/
-    auto swap(shared_ptr& other) noexcept -> void;/*noexcept*/
-    auto operator ->() const -> T *;/*strong*/
-    auto operator *() const -> T *;/*strong*/
-    auto get() const noexcept -> T *;/*noexcept*/
+   
+    T * operator ->() const; /*strong*/
+    T & operator *() const;/*strong*/
+    T * get() const;/*noexcept*/
+    size_t refs() const;/*noexcept*/
+    auto clear() -> void;
+	
     ~shared_ptr();
-    auto count() const->size_t;/*noexcept*/
- 
+    void swap (shared_ptr & other);
 private:
-   auto swap(shared_ptr&& other) noexcept -> void;
+   
     T* ptr_;
-    size_t *count_;
+    size_t *refs_;
 };
 
-//_____________________________________________________________________________________________________
-//_____________________________________________________________________________________________________
-//_____________________________________________________________________________________________________
-//_____________________________________________________________________________________________________
-template <typename T, class ...Args>
-auto make_shared( Args && ...args ) -> shared_ptr<T>
-{
-    return shared_ptr<T>( new T( std::forward<Args>(args)... ) );
+
+//______________________________________________________________________________________________________________________________________
+//______________________________________________________________________________________________________________________________________
+
+
+template<typename T>
+shared_ptr<T>::shared_ptr():ptr_(nullptr), refs_(nullptr) {}
+ 
+template<typename T>
+shared_ptr<T>::shared_ptr(T * ptr): ptr_(ptr), refs_(new size_t(1)){}
+ 
+template<typename T>
+shared_ptr<T>::shared_ptr(shared_ptr const & other) : refs_(other.refs_), ptr_(other.ptr_) { 
+    if(refs_ != nullptr) ++(*refs_);
+}
+
+template<typename T>
+shared_ptr<T>::~shared_ptr() {
+   clear();
+}
+
+auto shared_ptr<T>::clear() -> void {
+	if (!--*refs_)
+	{
+            delete ptr_;
+            delete refs_;
+        }
 }
 
 template<typename T> 
-auto shared_ptr<T>::get() const noexcept -> T * {
+T * shared_ptr<T>::get() const { return ptr_; }
+
+template<typename T>
+size_t shared_ptr<T>::refs() const {
+	if (refs_ == nullptr)
+		return 0;
+	else
+		return *refs_;
+}
+
+template<typename T>
+T * shared_ptr<T>::operator ->() const {
+        if (ptr_ == nullptr)
+		throw ("nullptr");
 	return ptr_;
 }
 
-template<typename T> 
-auto shared_ptr<T>::swap(shared_ptr & other) noexcept -> void {
-	std::swap(ptr_, other.ptr_);
-	std::swap(count_, other.count_);
+template<typename T>
+T & shared_ptr<T>::operator *() const {
+       if (ptr_ == nullptr)
+		throw ("nullptr");
+	return *ptr_;
 }
 
 template<typename T>
-auto shared_ptr<T>::swap(shared_ptr && other) noexcept -> void{
+void shared_ptr::swap(shared_ptr & other) {
 	std::swap(ptr_, other.ptr_);
-	std::swap(count_, other.count_);
+	std::swap(refs_, other.refs_);
 }
 
-template<typename T>
-shared_ptr<T>::shared_ptr():ptr_(nullptr), count_(nullptr){}
- 
-template<typename T>
-shared_ptr<T>::shared_ptr(T * ptr): ptr_(ptr), count_(new size_t(1)){}
- 
-template<typename T>
-shared_ptr<T>::shared_ptr(shared_ptr const & other) : count_(other.count_), ptr_(other.ptr_) { 
-    if(count_ != nullptr) ++(*count_);
-}
- 
+
+
+
+
+
+
 template<typename T>
 auto shared_ptr<T>::operator =(const shared_ptr & other) -> shared_ptr & {
 	if (this != &other) {
-		(shared_ptr<T>(other)).swap(*this);
+		ptr_ = other.ptr_;
+                refs = other.refs;
+                ++*refs
 	}
 	return *this;
 }
 
 template<typename T>
- shared_ptr<T>::shared_ptr(shared_ptr && other): ptr_(other.ptr_),count_(other.count_)
+shared_ptr<T>::shared_ptr(shared_ptr && other): ptr_(other.ptr_),count_(other.count_)
     {
         other.ptr_ = nullptr;
 	 other.count_=nullptr;
     }
     
-    template<typename T>
-    auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr &
+template<typename T>
+auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr &
     {
        if(this !=&other) this->swap(std::move(other));
 	return *this;
     }
 
  
-template<typename T>
-shared_ptr<T>::~shared_ptr(){
-    if (count_) {
-        if (*count_ == 1) {
-            delete count_;
-            delete ptr_;
-        }
-        else (*count_)--;
-    }
-}
+
  
-template<typename T>
-auto shared_ptr<T>::count() const->size_t{
-   return (count_ != nullptr ? *count_ : 0);
-}
-template<typename T>
-auto shared_ptr<T>::operator ->() const -> T *{
-        if(count_) {return ptr_;}else {throw std::logic_error("Error");}
-}
-template<typename T>
-auto shared_ptr<T>::operator *() const -> T *{
-       if(count_) {return *ptr_;}else {throw std::logic_error("Error");}
+
+
+
+template <typename T, class ...Args>
+auto make_shared( Args && ...args ) -> shared_ptr<T>
+{
+
+    return shared_ptr<T>( new T( std::forward<Args>(args)... ) );
 }
 
 
