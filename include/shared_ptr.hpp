@@ -47,7 +47,7 @@ auto shared_ptr<T>::swap(shared_ptr & other) -> void {
 template<typename T>
 auto shared_ptr<T>::swap(shared_ptr && other) noexcept -> void {
 	std::swap(ptr_, other.ptr_);
-	std::swap(count_, other.count_);
+	std::swap(refs_, other.refs_);
 }
 
 
