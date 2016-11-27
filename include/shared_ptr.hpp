@@ -18,7 +18,7 @@ public:
     T * get() const;                /*noexcept*/
 	
     ~shared_ptr();
-    void clear();
+    auto clear() -> void;
     auto refs() const->size_t;/*noexcept*/
  
 private:
@@ -48,7 +48,7 @@ auto shared_ptr<T>::swap(shared_ptr & other) -> void {
 }
 
 template<typename T> 
-void shared_ptr::clear() {
+auto shared_ptr::clear() -> void{
 	if (refs_) {
         if (*refs_ == 1) {
             delete refs_;
