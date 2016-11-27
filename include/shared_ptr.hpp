@@ -19,7 +19,7 @@ public:
     auto refs() const->size_t;/*noexcept*/
  
 private:
-    auto swap(shared_ptr&& other) noexcept -> void;
+    
     T*  ptr_;
     size_t*  refs_;
 };
@@ -44,11 +44,7 @@ auto shared_ptr<T>::swap(shared_ptr & other) -> void {
 	std::swap(refs_, other.refs_);
 }
 
-template<typename T>
-auto shared_ptr<T>::swap(shared_ptr && other) noexcept -> void {
-	std::swap(ptr_, other.ptr_);
-	std::swap(refs_, other.refs_);
-}
+
 
 
 
