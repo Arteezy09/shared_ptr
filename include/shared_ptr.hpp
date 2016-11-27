@@ -1,34 +1,34 @@
 #include <iostream>
-#include <utility>
-#include <stdexcept>
+
+
 template <typename T>
 class shared_ptr {
 public:
-    shared_ptr();/*noexcept*/
-    shared_ptr(T* ptr); /*strong*/
+    shared_ptr();           /*noexcept*/
+    shared_ptr(T* ptr);     /*strong*/
     shared_ptr(shared_ptr const & other); /*noexcept*/
-    shared_ptr(shared_ptr && other);  /*noexcept*/
+    shared_ptr(shared_ptr && other);      /*noexcept*/
     auto operator= (shared_ptr const & other)->shared_ptr &;  /*strong*/
-    auto operator =(shared_ptr && other) -> shared_ptr &;  /*strong*/
+    auto operator =(shared_ptr && other) -> shared_ptr &;     /*strong*/
 
-   
-    auto swap(shared_ptr& other) noexcept -> void;/*noexcept*/
-    T * operator ->() const;/*strong*/
-    T & operator *() const;/*strong*/
-    auto get() const noexcept -> T *;/*noexcept*/
+    void swap(shared_ptr & other);  /*noexcept*/
+    T * operator ->() const;        /*strong*/
+    T & operator *() const;         /*strong*/
+    T * get() const;                /*noexcept*/
     ~shared_ptr();
     auto refs() const->size_t;/*noexcept*/
  
 private:
-   auto swap(shared_ptr&& other) noexcept -> void;
-    T* ptr_;
-    size_t* refs_;
+   
+    T*  ptr_;
+    size_t*  refs_;
 };
+
 
 //_____________________________________________________________________________________________________
 //_____________________________________________________________________________________________________
-//_____________________________________________________________________________________________________
-//_____________________________________________________________________________________________________
+
+
 template <typename T, class ...Args>
 auto make_shared( Args && ...args ) -> shared_ptr<T>
 {
@@ -36,12 +36,10 @@ auto make_shared( Args && ...args ) -> shared_ptr<T>
 }
 
 template<typename T> 
-auto shared_ptr<T>::get() const noexcept -> T * {
-	return ptr_;
-}
+T * shared_ptr<T>::get() const { return ptr_; }
 
 template<typename T> 
-auto shared_ptr<T>::swap(shared_ptr & other) noexcept -> void {
+void shared_ptr<T>::swap(shared_ptr & other) {
 	std::swap(ptr_, other.ptr_);
 	std::swap(refs_, other.refs_);
 }
