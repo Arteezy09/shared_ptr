@@ -45,16 +45,17 @@ shared_ptr<T>::shared_ptr(shared_ptr const & other) : refs_(other.refs_), ptr_(o
 
 template<typename T>
 shared_ptr<T>::~shared_ptr() {
-   clear();
+    if (refs_) {
+        if (*refs_ == 1) {
+            delete refs_;
+            delete ptr_;
+        }
+        else (*refs_)--;
+    }
+
 }
 
-auto shared_ptr<T>::clear() -> void {
-	if (!--*refs_)
-	{
-            delete ptr_;
-            delete refs_;
-        }
-}
+
 
 template<typename T> 
 T * shared_ptr<T>::get() const { return ptr_; }
