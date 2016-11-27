@@ -18,7 +18,7 @@ public:
     T * get() const;                /*noexcept*/
 	
     ~shared_ptr();
-    auto refs() const->size_t;      /*noexcept*/
+    size_t refs() const;            /*noexcept*/
     void reset();                   /*noexcept*/
 	
 private:
@@ -63,7 +63,11 @@ auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr & {
 	return *this;
 }
 
- 
+template <class T>
+void shared_ptr<T>::reset() { this->swap(shared_ptr()); }
+
+
+
 template<typename T>
 shared_ptr<T>::~shared_ptr(){
     if (refs_) {
@@ -76,8 +80,11 @@ shared_ptr<T>::~shared_ptr(){
 }
  
 template<typename T>
-auto shared_ptr<T>::refs() const->size_t{
-   return (refs_ != nullptr ? *refs_ : 0);
+size_t shared_ptr<T>::refs() const {
+   if (refs_ == nullptr)
+		return 0;
+	else
+		return *refs_;
 }
 template<typename T>
 T * shared_ptr<T>::operator ->() const {
@@ -106,8 +113,7 @@ void shared_ptr<T>::swap(shared_ptr & other) {
 }
 
 
-template <class T>
-void shared_ptr<T>::reset() { this->swap(shared_ptr()); }
+
 
 
 
