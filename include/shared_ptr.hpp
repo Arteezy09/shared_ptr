@@ -100,8 +100,11 @@ T & shared_ptr<T>::operator *() const {
 
 template<typename T>
 shared_ptr<T>::~shared_ptr() {
+   if (ptr_ != nullptr && refs_ != nullptr && --(*refs_) == 0)
+   {  
 	   delete ptr_;
 	   delete refs_;
+   }
 }
  
 template<typename T> 
