@@ -32,6 +32,13 @@ private:
 //______________________________________________________________________________________________________________________________________
 
 
+template <typename T, class ...Args>
+auto make_shared( Args && ...args ) -> shared_ptr<T>
+{
+
+    return shared_ptr<T>( new T( std::forward<Args>(args)... ) );
+}
+
 template<typename T>
 shared_ptr<T>::shared_ptr():ptr_(nullptr), refs_(nullptr) {}
  
@@ -115,12 +122,7 @@ auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr & {
 
  
 
-template <typename T, class ...Args>
-auto make_shared( Args && ...args ) -> shared_ptr<T>
-{
 
-    return shared_ptr<T>( new T( std::forward<Args>(args)... ) );
-}
 
 
 
