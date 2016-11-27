@@ -19,10 +19,11 @@ public:
 	
     ~shared_ptr();
     void swap (shared_ptr & other);
+    void reset();
 private:
    
     T* ptr_;
-    size_t *refs_;
+    size_t* refs_;
 };
 
 
@@ -86,34 +87,30 @@ void shared_ptr::swap(shared_ptr & other) {
 }
 
 
-
-
+template <class T>
+void shared_ptr<T>::reset() { this->swap(shared_ptr()); }
 
 
 
 template<typename T>
 auto shared_ptr<T>::operator =(const shared_ptr & other) -> shared_ptr & {
 	if (this != &other) {
-		ptr_ = other.ptr_;
-                refs = other.refs;
-                ++*refs
+		shared_ptr(other).swap(*this); 
 	}
 	return *this;
 }
 
 template<typename T>
-shared_ptr<T>::shared_ptr(shared_ptr && other): ptr_(other.ptr_),count_(other.count_)
-    {
+shared_ptr<T>::shared_ptr(shared_ptr && other): ptr_(other.ptr_),count_(other.count_)  {
         other.ptr_ = nullptr;
-	 other.count_=nullptr;
-    }
+        other.count_=nullptr;
+}
     
 template<typename T>
-auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr &
-    {
+auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr & {
        if(this !=&other) this->swap(std::move(other));
-	return *this;
-    }
+       return *this;
+}
 
  
 
