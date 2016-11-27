@@ -18,8 +18,9 @@ public:
     T * get() const;                /*noexcept*/
 	
     ~shared_ptr();
-    auto refs() const->size_t;/*noexcept*/
- 
+    auto refs() const->size_t;      /*noexcept*/
+    void reset();                   /*noexcept*/
+	
 private:
     
     T*   ptr_;
@@ -29,25 +30,6 @@ private:
 
 //_____________________________________________________________________________________________________
 //_____________________________________________________________________________________________________
-
-
-template <typename T, class ...Args>
-auto make_shared( Args && ...args ) -> shared_ptr<T>
-{
-    return shared_ptr<T>( new T( std::forward<Args>(args)... ) );
-}
-
-template<typename T> 
-T * shared_ptr<T>::get() const { return ptr_; }
-
-template<typename T> 
-void shared_ptr<T>::swap(shared_ptr & other) {
-	std::swap(ptr_, other.ptr_);
-	std::swap(refs_, other.refs_);
-}
-
-
-
 
 
 template<typename T>
@@ -70,18 +52,16 @@ auto shared_ptr<T>::operator =(const shared_ptr & other) -> shared_ptr & {
 }
 
 template<typename T>
- shared_ptr<T>::shared_ptr(shared_ptr && other): ptr_(other.ptr_),refs_(other.refs_)
-    {
+shared_ptr<T>::shared_ptr(shared_ptr && other): ptr_(other.ptr_),refs_(other.refs_) {
         other.ptr_ = nullptr;
-	 other.refs_=nullptr;
-    }
+        other.refs_ = nullptr;
+}
     
-    template<typename T>
-    auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr &
-    {
-       if(this !=&other) this->swap(std::move(other));
+template<typename T>
+auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr & {
+       if(this != &other) this->swap(other);
 	return *this;
-    }
+}
 
  
 template<typename T>
@@ -110,7 +90,24 @@ T & shared_ptr<T>::operator *() const {
 
  
 
+template <typename T, class ...Args>
+auto make_shared( Args && ...args ) -> shared_ptr<T>
+{
+    return shared_ptr<T>( new T( std::forward<Args>(args)... ) );
+}
 
+template<typename T> 
+T * shared_ptr<T>::get() const { return ptr_; }
+
+template<typename T> 
+void shared_ptr<T>::swap(shared_ptr & other) {
+	std::swap(ptr_, other.ptr_);
+	std::swap(refs_, other.refs_);
+}
+
+
+template <class T>
+void shared_ptr<T>::reset() { this->swap(shared_ptr()); }
 
 
 
