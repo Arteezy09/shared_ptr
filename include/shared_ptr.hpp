@@ -66,7 +66,30 @@ auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr & {
 template <class T>
 void shared_ptr<T>::reset() { this->swap(shared_ptr()); }
 
+template<typename T>
+size_t shared_ptr<T>::refs() const {
+   if (refs_ == nullptr)
+		return 0;
+	else
+		return *refs_;
+}
 
+template<typename T> 
+T * shared_ptr<T>::get() const { return ptr_; }
+
+template<typename T>
+T * shared_ptr<T>::operator ->() const {
+        if (ptr_ == nullptr)
+		throw ("nullptr");
+	return ptr_;
+}
+
+template<typename T>
+T & shared_ptr<T>::operator *() const {
+       if (ptr_ == nullptr)
+		throw ("nullptr");
+	return *ptr_;
+}
 
 template<typename T>
 shared_ptr<T>::~shared_ptr(){
@@ -79,23 +102,12 @@ shared_ptr<T>::~shared_ptr(){
     }
 }
  
-template<typename T>
-size_t shared_ptr<T>::refs() const {
-   if (refs_ == nullptr)
-		return 0;
-	else
-		return *refs_;
-}
-template<typename T>
-T * shared_ptr<T>::operator ->() const {
-        if(refs_) {return ptr_;}else {throw std::logic_error("Error");}
-}
-template<typename T>
-T & shared_ptr<T>::operator *() const {
-       if(refs_) {return *ptr_;}else {throw std::logic_error("Error");}
+template<typename T> 
+void shared_ptr<T>::swap(shared_ptr & other) {
+	std::swap(ptr_, other.ptr_);
+	std::swap(refs_, other.refs_);
 }
 
- 
 
 template <typename T, class ...Args>
 auto make_shared( Args && ...args ) -> shared_ptr<T>
@@ -103,14 +115,9 @@ auto make_shared( Args && ...args ) -> shared_ptr<T>
     return shared_ptr<T>( new T( std::forward<Args>(args)... ) );
 }
 
-template<typename T> 
-T * shared_ptr<T>::get() const { return ptr_; }
 
-template<typename T> 
-void shared_ptr<T>::swap(shared_ptr & other) {
-	std::swap(ptr_, other.ptr_);
-	std::swap(refs_, other.refs_);
-}
+
+
 
 
 
