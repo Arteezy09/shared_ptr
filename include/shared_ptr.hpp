@@ -5,14 +5,16 @@ template <typename T>
 class shared_ptr {
 public:
     shared_ptr();/*noexcept*/
-    shared_ptr(T* ptr);/*strong*/
-    shared_ptr(shared_ptr const & other);
-    shared_ptr(shared_ptr && other);/*noexcept*/
-    auto operator= (shared_ptr const & other)->shared_ptr &;/*noexcept*/
-    auto operator =(shared_ptr && other) -> shared_ptr &;/*noexcept*/
+    shared_ptr(T* ptr); /*strong*/
+    shared_ptr(shared_ptr const & other); /*noexcept*/
+    shared_ptr(shared_ptr && other);  /*noexcept*/
+    auto operator= (shared_ptr const & other)->shared_ptr &;  /*strong*/
+    auto operator =(shared_ptr && other) -> shared_ptr &;  /*strong*/
+
+   
     auto swap(shared_ptr& other) noexcept -> void;/*noexcept*/
-    auto operator ->() const -> T *;/*strong*/
-    auto operator *() const -> T *;/*strong*/
+    T * operator ->() const;/*strong*/
+    T & operator *() const;/*strong*/
     auto get() const noexcept -> T *;/*noexcept*/
     ~shared_ptr();
     auto refs() const->size_t;/*noexcept*/
@@ -100,11 +102,11 @@ auto shared_ptr<T>::refs() const->size_t{
    return (refs_ != nullptr ? *refs_ : 0);
 }
 template<typename T>
-auto shared_ptr<T>::operator ->() const -> T *{
+T * shared_ptr<T>::operator ->() const {
         if(refs_) {return ptr_;}else {throw std::logic_error("Error");}
 }
 template<typename T>
-auto shared_ptr<T>::operator *() const -> T *{
+T & shared_ptr<T>::operator *() const {
        if(refs_) {return *ptr_;}else {throw std::logic_error("Error");}
 }
 
