@@ -1,15 +1,15 @@
 #include <iostream>
-#include <utility>
-#include <stdexcept>
+
 template <typename T>
-class shared_ptr {
+class shared_ptr 
+{
 public:
-    shared_ptr();/*noexcept*/
-    shared_ptr(T* ptr);/*strong*/
-    shared_ptr(shared_ptr const & other);
-    shared_ptr(shared_ptr && other);/*noexcept*/
-    auto operator= (shared_ptr const & other)->shared_ptr &;/*noexcept*/
-    auto operator =(shared_ptr && other) -> shared_ptr &;/*noexcept*/
+    shared_ptr();            /*noexcept*/
+    shared_ptr(T* ptr);     /*strong*/
+    shared_ptr(shared_ptr const & other); /*noexcept*/
+    shared_ptr(shared_ptr && other);      /*noexcept*/
+    auto operator= (shared_ptr const & other)->shared_ptr &;  /*strong*/
+    auto operator =(shared_ptr && other) -> shared_ptr &;  /*strong*/
    
     T * operator ->() const; /*strong*/
     T & operator *() const;/*strong*/
@@ -17,9 +17,9 @@ public:
     size_t refs() const;/*noexcept*/
     auto clear() -> void;
 	
-    ~shared_ptr();
-    void swap (shared_ptr & other);
-    void reset();
+    ~shared_ptr(); 
+    void swap (shared_ptr & other); /*noexcept*/
+    void reset(); /*noexcept*/
 private:
    
     T* ptr_;
@@ -91,7 +91,6 @@ template <class T>
 void shared_ptr<T>::reset() { this->swap(shared_ptr()); }
 
 
-
 template<typename T>
 auto shared_ptr<T>::operator =(const shared_ptr & other) -> shared_ptr & {
 	if (this != &other) {
@@ -108,15 +107,11 @@ shared_ptr<T>::shared_ptr(shared_ptr && other): ptr_(other.ptr_),count_(other.co
     
 template<typename T>
 auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr & {
-       if(this !=&other) this->swap(std::move(other));
+       if(this != &other) this->swap(other);
        return *this;
 }
 
  
-
- 
-
-
 
 template <typename T, class ...Args>
 auto make_shared( Args && ...args ) -> shared_ptr<T>
