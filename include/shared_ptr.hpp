@@ -12,16 +12,19 @@ public:
     auto operator =(shared_ptr && other) -> shared_ptr &;     /*strong*/
 
     auto swap(shared_ptr& other) -> void;  /*noexcept*/
+	
     T * operator ->() const;        /*strong*/
     T & operator *() const;         /*strong*/
     T * get() const;                /*noexcept*/
+	
     ~shared_ptr();
+    void clear();
     auto refs() const->size_t;/*noexcept*/
  
 private:
     
-    T*  ptr_;
-    size_t*  refs_;
+    T*   ptr_;
+    size_t*   refs_;
 };
 
 
@@ -44,8 +47,16 @@ auto shared_ptr<T>::swap(shared_ptr & other) -> void {
 	std::swap(refs_, other.refs_);
 }
 
-
-
+template<typename T> 
+void shared_ptr::clear() {
+	if (refs_) {
+        if (*refs_ == 1) {
+            delete refs_;
+            delete ptr_;
+        }
+        else (*refs_)--;
+    }
+}
 
 
 
@@ -85,13 +96,7 @@ template<typename T>
  
 template<typename T>
 shared_ptr<T>::~shared_ptr(){
-    if (refs_) {
-        if (*refs_ == 1) {
-            delete refs_;
-            delete ptr_;
-        }
-        else (*refs_)--;
-    }
+    clear();
 }
  
 template<typename T>
