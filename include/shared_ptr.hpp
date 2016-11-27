@@ -64,7 +64,15 @@ auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr & {
 }
 
 template <class T>
-void shared_ptr<T>::reset() { this->swap(shared_ptr()); }
+void shared_ptr<T>::reset() { 
+	if (ptr_ != nullptr && refs_ != nullptr && --(*refs_) == 0)
+   {
+	   delete ptr_;
+	   delete refs_;
+   }
+	ptr_ = nullptr;
+	refs_ = nullptr;
+}
 
 template<typename T>
 size_t shared_ptr<T>::refs() const {
