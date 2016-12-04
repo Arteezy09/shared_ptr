@@ -3,21 +3,21 @@
 template <typename T>
 class shared_ptr {
 public:
-    shared_ptr();           /*noexcept*/
+    shared_ptr();           /*noexcept*/ // конструктор по умолчанию создает пустую shared_ptr
     shared_ptr(T* ptr);     /*strong*/
     shared_ptr(shared_ptr const & other); /*noexcept*/
     shared_ptr(shared_ptr && other);      /*noexcept*/
     auto operator= (shared_ptr const & other)->shared_ptr &;  /*strong*/
     auto operator =(shared_ptr && other) -> shared_ptr &;     /*strong*/
 
-    void swap(shared_ptr& other);  /*noexcept*/
+    void swap(shared_ptr& other);  /*noexcept*/ // меняет местами два объекта shared_ptr
 	
-    T * operator ->() const;        /*strong*/
-    T & operator *() const;         /*strong*/
-    T * get() const;                /*noexcept*/
+    T * operator ->() const;        /*strong*/ // возвращает указатель на управляемый объект
+    T & operator *() const;         /*strong*/ // возвращает указанное значение
+    T * get() const;                /*noexcept*/ 
 	
     ~shared_ptr();
-    size_t refs() const;            /*noexcept*/
+    size_t refs() const; /*noexcept*/ // возвращает количество объектов shared_ptr, которые ссылаются на тот же управляемый объект
     void reset();                   /*noexcept*/
 	
 private:
@@ -31,7 +31,7 @@ private:
 //_____________________________________________________________________________________________________
 
 
-template<typename T>
+template<typename T>   // конструктор по умолчанию создает пустую shared_ptr
 shared_ptr<T>::shared_ptr():ptr_(nullptr), refs_(nullptr){}
  
 template<typename T>
@@ -73,7 +73,7 @@ void shared_ptr<T>::reset() {
 	refs_ = nullptr;
 }
 
-template<typename T>
+template<typename T>   // возвращает количество объектов shared_ptr, которые ссылаются на тот же управляемый объект
 size_t shared_ptr<T>::refs() const {
    if (refs_ == nullptr)
 		return 0;
@@ -81,17 +81,17 @@ size_t shared_ptr<T>::refs() const {
 		return *refs_;
 }
 
-template<typename T> 
+template<typename T>   
 T * shared_ptr<T>::get() const { return ptr_; }
 
-template<typename T>
+template<typename T>   // возвращает указатель на управляемый объект
 T * shared_ptr<T>::operator ->() const {
         if (ptr_ == nullptr)
 		throw ("nullptr");
 	return ptr_;
 }
 
-template<typename T>
+template<typename T>   // возвращает указанное значение
 T & shared_ptr<T>::operator *() const {
        if (ptr_ == nullptr)
 		throw ("nullptr");
@@ -107,7 +107,7 @@ shared_ptr<T>::~shared_ptr() {
    }
 }
  
-template<typename T> 
+template<typename T>   // меняет местами два объекта shared_ptr
 void shared_ptr<T>::swap(shared_ptr & other) {
 	std::swap(ptr_, other.ptr_);
 	std::swap(refs_, other.refs_);
