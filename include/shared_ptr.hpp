@@ -4,11 +4,11 @@ template <typename T>
 class shared_ptr {
 public:
     shared_ptr();           /*noexcept*/ // конструктор по умолчанию создает пустую shared_ptr
-    shared_ptr(T* ptr);     /*strong*/
-    shared_ptr(shared_ptr const & other); /*noexcept*/
-    shared_ptr(shared_ptr && other);      /*noexcept*/
-    auto operator= (shared_ptr const & other)->shared_ptr &;  /*strong*/
-    auto operator =(shared_ptr && other) -> shared_ptr &;     /*strong*/
+    shared_ptr(T* ptr);     /*strong*/  // cоздает shared_ptr с ptr как управляемого объекта, создает управляющий блок
+    shared_ptr(shared_ptr const & other); /*noexcept*/ // конструктор копирования
+    shared_ptr(shared_ptr && other);      /*noexcept*/ // конструктор перемещения
+    auto operator= (shared_ptr const & other)->shared_ptr &;  /*strong*/ // оператор присваивания
+    auto operator =(shared_ptr && other) -> shared_ptr &;     /*strong*/ // оператор присваивания перемещения
 
     void swap(shared_ptr& other);  /*noexcept*/ // меняет местами два объекта shared_ptr
 	
@@ -26,6 +26,11 @@ private:
     size_t*   refs_;
 };
 
+template <typename T, class ...Args> // создает объект типа T, на который будет указывать shared_ptr, создает управляющий блок
+auto make_shared( Args && ...args ) -> shared_ptr<T>
+{
+    return shared_ptr<T>( new T( std::forward<Args>(args)... ) );
+}
 
 //_____________________________________________________________________________________________________
 //_____________________________________________________________________________________________________
@@ -37,12 +42,12 @@ shared_ptr<T>::shared_ptr():ptr_(nullptr), refs_(nullptr){}
 template<typename T>
 shared_ptr<T>::shared_ptr(T * ptr): ptr_(ptr), refs_(new size_t(1)){}
  
-template<typename T>
+template<typename T>   // конструктор копирования
 shared_ptr<T>::shared_ptr(shared_ptr const & other) : refs_(other.refs_), ptr_(other.ptr_) { 
     if(refs_ != nullptr) ++(*refs_);
 }
  
-template<typename T>
+template<typename T>   // оператор присваивания
 auto shared_ptr<T>::operator =(const shared_ptr & other) -> shared_ptr & {
 	if (this != &other) {
 		(shared_ptr<T>(other)).swap(*this);
@@ -50,13 +55,13 @@ auto shared_ptr<T>::operator =(const shared_ptr & other) -> shared_ptr & {
 	return *this;
 }
 
-template<typename T>
+template<typename T>   // конструктор перемещения
 shared_ptr<T>::shared_ptr(shared_ptr && other): ptr_(other.ptr_),refs_(other.refs_) {
         other.ptr_ = nullptr;
         other.refs_ = nullptr;
 }
     
-template<typename T>
+template<typename T>   // оператор присваивания перемещения
 auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr & {
        if(this != &other) this->swap(other);
 	return *this;
@@ -114,11 +119,6 @@ void shared_ptr<T>::swap(shared_ptr & other) {
 }
 
 
-template <typename T, class ...Args>
-auto make_shared( Args && ...args ) -> shared_ptr<T>
-{
-    return shared_ptr<T>( new T( std::forward<Args>(args)... ) );
-}
 
 
 
