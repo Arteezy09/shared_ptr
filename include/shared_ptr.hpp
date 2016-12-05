@@ -63,8 +63,12 @@ shared_ptr<T>::shared_ptr(shared_ptr && other): ptr_(other.ptr_),refs_(other.ref
     
 template<typename T>   // оператор присваивания перемещения
 auto shared_ptr<T>::operator =(shared_ptr && other) -> shared_ptr & {
-       if(this != &other) this->swap(other);
-	return *this;
+       if(this != &other) {
+	       this->swap(other);
+	       other.ptr_ = nullptr;
+	       other.refs_ = nullptr;
+	       }
+       return *this;
 }
 
 template <class T>
