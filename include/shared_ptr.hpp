@@ -7,8 +7,8 @@ public:
     shared_ptr(T* ptr);     /*strong*/  // cоздает shared_ptr с ptr как управляемого объекта, создает управляющий блок
     shared_ptr(shared_ptr const & other); /*noexcept*/ // конструктор копирования
     shared_ptr(shared_ptr && other);      /*noexcept*/ // конструктор перемещения
-    auto operator= (shared_ptr const & other)->shared_ptr &;  /*strong*/ // оператор присваивания
-    auto operator =(shared_ptr && other) -> shared_ptr &;     /*strong*/ // оператор присваивания перемещения
+    auto operator= (shared_ptr const & other)->shared_ptr &;  /*noexcept*/ // оператор присваивания
+    auto operator =(shared_ptr && other) -> shared_ptr &;     /*noexcept*/ // оператор присваивания перемещения
 
     void swap(shared_ptr& other);  /*noexcept*/ // меняет местами два объекта shared_ptr
 	
